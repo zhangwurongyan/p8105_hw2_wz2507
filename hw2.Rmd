@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Problem 1
 ```{r, message=FALSE}
+# load library
 library(readxl)
 library(tidyverse)
 library(ggplot2)
@@ -18,22 +19,23 @@ library(ggplot2)
 
 
 ```{r}
-# create the data set
+# Import the trash wheel data set
 trash <- read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1, range = "A2:N408") %>% 
   janitor::clean_names() %>% #clean names
   drop_na(dumpster) %>% #drop non dumpster data
+  #round the number of sports balls
   mutate(
     sports_balls = as.integer( sports_balls)) 
-#round the number to integers
+
   
   
 ```
 
 ```{r}
-# create precipatation data for 2018
+# import precipatation data for 2018
 trash18 <- read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 3, range = "A2:B14") %>% 
   janitor::clean_names() %>% 
-  mutate(Year = "2018") %>% #change the year to 2018
+  mutate(Year = "2018") %>% #add the variable year
   mutate(month = month.name) %>% #change to full month names
   drop_na()  #omit rows without data
 
@@ -44,7 +46,7 @@ trash18 <- read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet 
 trash17 <- read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 4, range = "A2:B14")%>% 
   janitor::clean_names() %>% 
   mutate(month = month.name) %>% #change to full month names
-  mutate(Year = "2017") #change the year to 2018
+  mutate(Year = "2017") #add the variable year
   
 ```
 
@@ -54,18 +56,16 @@ precip1718 <- as.tibble(rbind(trash17, trash18))
 
 ```
 
-
-
-
 ```{r}
+# filter the data set only contains sports balls in 2017 in order to find the median
 ball17 <- tibble(x = pull(trash, year ), y = pull(trash, sports_balls )) %>% 
   filter(x == "2017")
 ```
 
-Comment: The number of observations in Mr.Trash Wheel data set is `r nrow(trash)` with 14 variables and in precipatation data set is `r nrow(precip1718)` with 3 variables. 
-key variables??
+Comment: The number of observations in Mr.Trash Wheel data set is `r nrow(trash)` with 14 variables and the number of observations in precipatation data set is `r nrow(precip1718)` with 3 variables. 
+
 The total precipatation in 2018 is `r sum(pull(trash18, total))`. The median of sports ball is `r median(pull(ball17, y))`.
-The key variables for trash includes dumpter number(dumpster), data of collection, amount of total litter(weight_tons, volume_cubic_yards) and litter type(plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, etc.). For the precipatation data, it includes month, year and the total precipitation amounts.
+The key variables for trash data set include dumpter number (dumpster), date of collection, amount of total litter (weight_tons, volume_cubic_yards) and litter types (plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, etc.). For the precipatation data, it includes month, year and the total precipitation amounts.
 
 
 
@@ -73,14 +73,14 @@ The key variables for trash includes dumpter number(dumpster), data of collectio
 ## Problem 2
 
 ```{r, message=FALSE}
-# create pols data set
+# import pols data set
 pols <- read_csv("data/pols-month.csv") %>% 
-  #convert the date into year, month and day
+  #separate the date into year, month and day to 3 variables
   separate(mon, into = c("year", "month", "day")) %>% 
   #change month into full name
   mutate(month = as.integer(month)) %>% 
   mutate(month = month.name[month]) %>% 
-  #specify if the presidwent is democrat or republican
+  #specify if the president is democrat or republican by adding a new variable president
   mutate(prez_dem = recode(prez_dem, "1" = "democrat", "0" = "republican")) %>% 
   mutate(president =  prez_dem) %>% 
   #delete prez_dem, prez_gop and day
@@ -90,7 +90,7 @@ pols <- read_csv("data/pols-month.csv") %>%
 ```
 
 ```{r, message=FALSE}
-# create snp data set
+# import snp data set
 snp <- read_csv("data/snp.csv") %>% 
   #convert the date into year, month and day
   separate(date, into = c("month", "day", "year")) %>%
@@ -105,7 +105,7 @@ snp <- read_csv("data/snp.csv") %>%
 ```
 
 ```{r, message=FALSE}
-#create unemployment data set
+# import unemployment data set
 une <- read_csv("data/unemployment.csv") %>% 
   janitor::clean_names() %>% 
   # change month to a column
@@ -121,20 +121,17 @@ une <- read_csv("data/unemployment.csv") %>%
 ```
 
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 #combine those three data sets
 join = full_join(pols, une)
 all = full_join(join, snp)
 ```
 
 
-Comments: The dimension of the data set after combination is `r nrow(all)` entries with `r ncol(all)` total columns(if we delete prez_gop, prez_dem and day). The range of years is 1947 to 2015. However, pols data starts from 1947, snp data starts from 1950 and une data starts from 1947. Therefore, the combined data range from 1947 to 2015. The names of key variables are --
+Comments: The dimension of the data set after combination is `r nrow(all)` entries with `r ncol(all)` total columns (if we delete prez_gop, prez_dem and day). The range of years is from 1947 to 2015. Specifically for each data set, the dimension of pols data set is `r nrow(pols)` entries with `r ncol(pols)` columns ranging from 1947 to 2015; the dimension of snp data is `r nrow(snp)` entries with `r ncol(snp)` columns ranging from 1950 to 2015 ; the dimension of unemplyment data is `r nrow(une)` entries with `r ncol(une)` columns ranging from 1948 to 2015. The names of key variables are --
 
-for pols data:
 
-year: year of the count
-
-month: month of the count of the year
+year: year of the count; month: month of the count of the year; day: the day of the observation
 
 rep_dem: the number of democratic representatives on the associated date
 
@@ -150,21 +147,7 @@ sen_dem: the number of democratic senators on the associated date
 
 president:  indicator of whether the president was democratic or republican
 
-for snp data:
-
-year: the date of the observation
-
-month: the month of the observation
-
-day: the day of the observation
-
 close: the closing values of the S&P stock index on the associated date
-
-for unemployment data:
-
-year: the year of the measurements on that row
-
-month: the month of the measurements on that row
 
 rate: unemployment rate
 
@@ -178,10 +161,10 @@ first <- function(s) {
 ```
   
 ```{r, message=FALSE}
-# create the data set
+# import the baby name data set
 # change column names
 baby <- read_csv("data/Popular_Baby_Names.csv", skip = 1,col_names =c("birth_year", "gender", "race", "first_name", "count","rank")) %>% 
-  # change the first name into capital letter of the first character with rest of lower case
+  # capitalize the first character of the first names 
   mutate(
     first_name = str_to_lower(first_name), first_name = first(first_name)) %>%
   # lower the case for gender
@@ -207,11 +190,16 @@ olivia = baby[pull(baby, first_name) == "Olivia",] %>%
 ```
 
 ```{r}
-# create the table
+# create the table to show the rank of Olivia
 pivot_wider(
   olivia, id_cols = "birth_year", names_from = "race", values_from = "rank"
 )
 ```
+or:
+```{r}
+pivot_wider(olivia, id_cols = "race", names_from = "birth_year", values_from = "rank") 
+```
+
 
 # ii.
 ```{r}
@@ -225,6 +213,11 @@ pivot_wider(
 )
 ```
 
+or: 
+```{r}
+pivot_wider(male_name, id_cols = "race",names_from = "birth_year",values_from = "first_name")
+```
+
 # iii.
 ```{r}
 # pull the data of male, white born in 2016
@@ -235,10 +228,13 @@ white16 = white[pull(white, birth_year) == "2016",]
 ```
 
 ```{r}
-# create the ggplot
+# create the ggplot showing the rank
 
-white16 %>% 
-  ggplot(aes(x = rank, y = count )) + geom_point() 
+plot = white16 %>% 
+  ggplot(aes(x = rank, y = count )) + geom_point() +labs(title = "number of children with a name against the rank in popularity of that name", x ="rank", y = "number of children")
+plot
+ggsave("plot.pdf")
+
 ```
 
 

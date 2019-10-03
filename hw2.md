@@ -6,26 +6,27 @@ Wurongyan Zhang
 ## Problem 1
 
 ``` r
+# load library
 library(readxl)
 library(tidyverse)
 library(ggplot2)
 ```
 
 ``` r
-# create the data set
+# Import the trash wheel data set
 trash <- read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1, range = "A2:N408") %>% 
   janitor::clean_names() %>% #clean names
   drop_na(dumpster) %>% #drop non dumpster data
+  #round the number of sports balls
   mutate(
     sports_balls = as.integer( sports_balls)) 
-#round the number to integers
 ```
 
 ``` r
-# create precipatation data for 2018
+# import precipatation data for 2018
 trash18 <- read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 3, range = "A2:B14") %>% 
   janitor::clean_names() %>% 
-  mutate(Year = "2018") %>% #change the year to 2018
+  mutate(Year = "2018") %>% #add the variable year
   mutate(month = month.name) %>% #change to full month names
   drop_na()  #omit rows without data
 ```
@@ -35,7 +36,7 @@ trash18 <- read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet 
 trash17 <- read_excel("data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 4, range = "A2:B14")%>% 
   janitor::clean_names() %>% 
   mutate(month = month.name) %>% #change to full month names
-  mutate(Year = "2017") #change the year to 2018
+  mutate(Year = "2017") #add the variable year
 ```
 
 ``` r
@@ -44,31 +45,34 @@ precip1718 <- as.tibble(rbind(trash17, trash18))
 ```
 
 ``` r
+# filter the data set only contains sports balls in 2017 in order to find the median
 ball17 <- tibble(x = pull(trash, year ), y = pull(trash, sports_balls )) %>% 
   filter(x == "2017")
 ```
 
 Comment: The number of observations in Mr.Trash Wheel data set is 344
-with 14 variables and in precipatation data set is 19 with 3 variables.
-key variables?? The total precipatation in 2018 is 23.5. The median of
-sports ball is 8. The key variables for trash includes dumpter
-number(dumpster), data of collection, amount of total
-litter(weight\_tons, volume\_cubic\_yards) and litter
-type(plastic\_bottles, polystyrene, cigarette\_butts, glass\_bottles,
-grocery\_bags, chip\_bags, sports\_balls, etc.). For the precipatation
-data, it includes month, year and the total precipitation amounts.
+with 14 variables and the number of observations in precipatation data
+set is 19 with 3 variables.
+
+The total precipatation in 2018 is 23.5. The median of sports ball is 8.
+The key variables for trash data set include dumpter number (dumpster),
+date of collection, amount of total litter (weight\_tons,
+volume\_cubic\_yards) and litter types (plastic\_bottles, polystyrene,
+cigarette\_butts, glass\_bottles, grocery\_bags, chip\_bags,
+sports\_balls, etc.). For the precipatation data, it includes month,
+year and the total precipitation amounts.
 
 ## Problem 2
 
 ``` r
-# create pols data set
+# import pols data set
 pols <- read_csv("data/pols-month.csv") %>% 
-  #convert the date into year, month and day
+  #separate the date into year, month and day to 3 variables
   separate(mon, into = c("year", "month", "day")) %>% 
   #change month into full name
   mutate(month = as.integer(month)) %>% 
   mutate(month = month.name[month]) %>% 
-  #specify if the presidwent is democrat or republican
+  #specify if the president is democrat or republican by adding a new variable president
   mutate(prez_dem = recode(prez_dem, "1" = "democrat", "0" = "republican")) %>% 
   mutate(president =  prez_dem) %>% 
   #delete prez_dem, prez_gop and day
@@ -78,7 +82,7 @@ pols <- read_csv("data/pols-month.csv") %>%
 ```
 
 ``` r
-# create snp data set
+# import snp data set
 snp <- read_csv("data/snp.csv") %>% 
   #convert the date into year, month and day
   separate(date, into = c("month", "day", "year")) %>%
@@ -92,7 +96,7 @@ snp <- read_csv("data/snp.csv") %>%
 ```
 
 ``` r
-#create unemployment data set
+# import unemployment data set
 une <- read_csv("data/unemployment.csv") %>% 
   janitor::clean_names() %>% 
   # change month to a column
@@ -109,26 +113,20 @@ une <- read_csv("data/unemployment.csv") %>%
 ``` r
 #combine those three data sets
 join = full_join(pols, une)
-```
-
-    ## Warning: Column `month` joining character vector and factor, coercing into
-    ## character vector
-
-``` r
 all = full_join(join, snp)
 ```
 
 Comments: The dimension of the data set after combination is 828 entries
-with 12 total columns(if we delete prez\_gop, prez\_dem and day). The
-range of years is 1947 to 2015. However, pols data starts from 1947, snp
-data starts from 1950 and une data starts from 1947. Therefore, the
-combined data range from 1947 to 2015. The names of key variables are –
+with 12 total columns (if we delete prez\_gop, prez\_dem and day). The
+range of years is from 1947 to 2015. Specifically for each data set, the
+dimension of pols data set is 822 entries with 9 columns ranging from
+1947 to 2015; the dimension of snp data is 787 entries with 4 columns
+ranging from 1950 to 2015 ; the dimension of unemplyment data is 816
+entries with 3 columns ranging from 1948 to 2015. The names of key
+variables are –
 
-for pols data:
-
-year: year of the count
-
-month: month of the count of the year
+year: year of the count; month: month of the count of the year; day: the
+day of the observation
 
 rep\_dem: the number of democratic representatives on the associated
 date
@@ -147,21 +145,7 @@ sen\_dem: the number of democratic senators on the associated date
 president: indicator of whether the president was democratic or
 republican
 
-for snp data:
-
-year: the date of the observation
-
-month: the month of the observation
-
-day: the day of the observation
-
 close: the closing values of the S\&P stock index on the associated date
-
-for unemployment data:
-
-year: the year of the measurements on that row
-
-month: the month of the measurements on that row
 
 rate: unemployment rate
 
@@ -175,10 +159,10 @@ first <- function(s) {
 ```
 
 ``` r
-# create the data set
+# import the baby name data set
 # change column names
 baby <- read_csv("data/Popular_Baby_Names.csv", skip = 1,col_names =c("birth_year", "gender", "race", "first_name", "count","rank")) %>% 
-  # change the first name into capital letter of the first character with rest of lower case
+  # capitalize the first character of the first names 
   mutate(
     first_name = str_to_lower(first_name), first_name = first(first_name)) %>%
   # lower the case for gender
@@ -203,7 +187,7 @@ olivia = baby[pull(baby, first_name) == "Olivia",] %>%
 ```
 
 ``` r
-# create the table
+# create the table to show the rank of Olivia
 pivot_wider(
   olivia, id_cols = "birth_year", names_from = "race", values_from = "rank"
 )
@@ -218,6 +202,20 @@ pivot_wider(
     ## 4       2014                  1                 8       16                1
     ## 5       2015                  1                 4       16                1
     ## 6       2016                  1                 8       13                1
+
+or:
+
+``` r
+pivot_wider(olivia, id_cols = "race", names_from = "birth_year", values_from = "rank") 
+```
+
+    ## # A tibble: 4 x 7
+    ##   race                       `2011` `2012` `2013` `2014` `2015` `2016`
+    ##   <chr>                       <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
+    ## 1 asian and pacific islander      4      3      3      1      1      1
+    ## 2 black non hispanic             10      8      6      8      4      8
+    ## 3 hispanic                       18     22     22     16     16     13
+    ## 4 white non hispanic              2      4      1      1      1      1
 
 # ii.
 
@@ -243,6 +241,21 @@ pivot_wider(
     ## 5       2015 Jayden             Noah              Liam     David           
     ## 6       2016 Ethan              Noah              Liam     Joseph
 
+or:
+
+``` r
+pivot_wider(male_name, id_cols = "race",names_from = "birth_year",values_from = "first_name")
+```
+
+    ## # A tibble: 4 x 7
+    ## # Groups:   race [4]
+    ##   race                       `2011`  `2012` `2013` `2014` `2015` `2016`
+    ##   <chr>                      <chr>   <chr>  <chr>  <chr>  <chr>  <chr> 
+    ## 1 asian and pacific islander Ethan   Ryan   Jayden Jayden Jayden Ethan 
+    ## 2 black non hispanic         Jayden  Jayden Ethan  Ethan  Noah   Noah  
+    ## 3 hispanic                   Jayden  Jayden Jayden Liam   Liam   Liam  
+    ## 4 white non hispanic         Michael Joseph David  Joseph David  Joseph
+
 # iii.
 
 ``` r
@@ -254,10 +267,17 @@ white16 = white[pull(white, birth_year) == "2016",]
 ```
 
 ``` r
-# create the ggplot
+# create the ggplot showing the rank
 
-white16 %>% 
-  ggplot(aes(x = rank, y = count )) + geom_point() 
+plot = white16 %>% 
+  ggplot(aes(x = rank, y = count )) + geom_point() +labs(title = "number of children with a name against the rank in popularity of that name", x ="rank", y = "number of children")
+plot
 ```
 
-![](hw2_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](hw2_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+ggsave("plot.pdf")
+```
+
+    ## Saving 7 x 5 in image
