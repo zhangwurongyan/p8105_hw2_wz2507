@@ -181,6 +181,50 @@ close: the closing values of the S\&P stock index on the associated date
 
 rate: unemployment rate
 
+The columns included in every single data set are shown below:
+
+``` r
+head(pols)
+```
+
+    ## # A tibble: 6 x 9
+    ##    year month    gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem president
+    ##   <int> <chr>      <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>    
+    ## 1  1947 January       23      51     253      23      45     198 democrat 
+    ## 2  1947 February      23      51     253      23      45     198 democrat 
+    ## 3  1947 March         23      51     253      23      45     198 democrat 
+    ## 4  1947 April         23      51     253      23      45     198 democrat 
+    ## 5  1947 May           23      51     253      23      45     198 democrat 
+    ## 6  1947 June          23      51     253      23      45     198 democrat
+
+``` r
+head(snp)
+```
+
+    ## # A tibble: 6 x 4
+    ##    year month    day   close
+    ##   <int> <chr>    <chr> <dbl>
+    ## 1  1950 January  3      17.0
+    ## 2  1950 February 1      17.2
+    ## 3  1950 March    1      17.3
+    ## 4  1950 April    3      18.0
+    ## 5  1950 May      1      18.8
+    ## 6  1950 June     1      17.7
+
+``` r
+head(une)
+```
+
+    ## # A tibble: 6 x 3
+    ##    year month    `unemployment rate`
+    ##   <dbl> <fct>                  <dbl>
+    ## 1  1948 January                  3.9
+    ## 2  1948 February                 3.9
+    ## 3  1948 March                    4  
+    ## 4  1948 April                    3.8
+    ## 5  1948 May                      3.4
+    ## 6  1948 June                     3.6
+
 ## Problem 3
 
 ``` r
@@ -269,7 +313,7 @@ plot = white16 %>%
 plot
 ```
 
-![](hw2_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](hw2_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 ggsave("plot.pdf")

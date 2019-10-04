@@ -156,6 +156,13 @@ close: the closing values of the S&P stock index on the associated date
 
 rate: unemployment rate
 
+The columns included in every single data set are shown below:
+```{r}
+head(pols)
+head(snp)
+head(une)
+```
+
 ## Problem 3
 
 ```{r}
