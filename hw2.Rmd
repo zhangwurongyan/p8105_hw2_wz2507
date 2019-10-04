@@ -62,10 +62,15 @@ ball17 <- tibble(x = pull(trash, year ), y = pull(trash, sports_balls )) %>%
   filter(x == "2017")
 ```
 
-Comment: The number of observations in Mr.Trash Wheel data set is `r nrow(trash)` with 14 variables and the number of observations in precipatation data set is `r nrow(precip1718)` with 3 variables. 
+Comment: The number of observations in Mr.Trash Wheel data set is `r nrow(trash)` with `r ncol(trash)` variables and the number of observations in precipatation data set is `r nrow(precip1718)` with `r ncol(precip1718)` variables. 
 
 The total precipatation in 2018 is `r sum(pull(trash18, total))`. The median of sports ball is `r median(pull(ball17, y))`.
-The key variables for trash data set include dumpter number (dumpster), date of collection, amount of total litter (weight_tons, volume_cubic_yards) and litter types (plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, etc.). For the precipatation data, it includes month, year and the total precipitation amounts.
+The key variables for trash data set include dumpter number (dumpster), date of collection, amount of total litter (weight_tons, volume_cubic_yards) and litter types (plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, etc.). For the precipatation data, it includes month, year and the total precipitation amounts. The name of the columns are shown below:
+```{r}
+head(trash)
+head(precip1718)
+```
+
 
 
 
@@ -191,12 +196,6 @@ olivia = baby[pull(baby, first_name) == "Olivia",] %>%
 
 ```{r}
 # create the table to show the rank of Olivia
-pivot_wider(
-  olivia, id_cols = "birth_year", names_from = "race", values_from = "rank"
-)
-```
-or:
-```{r}
 pivot_wider(olivia, id_cols = "race", names_from = "birth_year", values_from = "rank") 
 ```
 
@@ -208,15 +207,10 @@ male_name = baby[pull(baby, gender) == "male",] %>%
   group_by(birth_year, race) %>% 
   slice(which.min(rank))
 # create the table
-pivot_wider(
-  male_name, id_cols = "birth_year", names_from = "race", values_from = "first_name"
-)
-```
-
-or: 
-```{r}
 pivot_wider(male_name, id_cols = "race",names_from = "birth_year",values_from = "first_name")
 ```
+
+
 
 # iii.
 ```{r}

@@ -60,7 +60,39 @@ date of collection, amount of total litter (weight\_tons,
 volume\_cubic\_yards) and litter types (plastic\_bottles, polystyrene,
 cigarette\_butts, glass\_bottles, grocery\_bags, chip\_bags,
 sports\_balls, etc.). For the precipatation data, it includes month,
-year and the total precipitation amounts.
+year and the total precipitation amounts. The name of the columns are
+shown below:
+
+``` r
+head(trash)
+```
+
+    ## # A tibble: 6 x 14
+    ##   dumpster month  year date                weight_tons volume_cubic_ya…
+    ##      <dbl> <chr> <dbl> <dttm>                    <dbl>            <dbl>
+    ## 1        1 May    2014 2014-05-16 00:00:00        4.31               18
+    ## 2        2 May    2014 2014-05-16 00:00:00        2.74               13
+    ## 3        3 May    2014 2014-05-16 00:00:00        3.45               15
+    ## 4        4 May    2014 2014-05-17 00:00:00        3.1                15
+    ## 5        5 May    2014 2014-05-17 00:00:00        4.06               18
+    ## 6        6 May    2014 2014-05-20 00:00:00        2.71               13
+    ## # … with 8 more variables: plastic_bottles <dbl>, polystyrene <dbl>,
+    ## #   cigarette_butts <dbl>, glass_bottles <dbl>, grocery_bags <dbl>,
+    ## #   chip_bags <dbl>, sports_balls <int>, homes_powered <dbl>
+
+``` r
+head(precip1718)
+```
+
+    ## # A tibble: 6 x 3
+    ##   month    total Year 
+    ##   <chr>    <dbl> <chr>
+    ## 1 January   2.34 2017 
+    ## 2 February  1.46 2017 
+    ## 3 March     3.57 2017 
+    ## 4 April     3.99 2017 
+    ## 5 May       5.64 2017 
+    ## 6 June      1.4  2017
 
 ## Problem 2
 
@@ -188,24 +220,6 @@ olivia = baby[pull(baby, first_name) == "Olivia",] %>%
 
 ``` r
 # create the table to show the rank of Olivia
-pivot_wider(
-  olivia, id_cols = "birth_year", names_from = "race", values_from = "rank"
-)
-```
-
-    ## # A tibble: 6 x 5
-    ##   birth_year `asian and pacifi… `black non hispa… hispanic `white non hisp…
-    ##        <dbl>              <dbl>             <dbl>    <dbl>            <dbl>
-    ## 1       2011                  4                10       18                2
-    ## 2       2012                  3                 8       22                4
-    ## 3       2013                  3                 6       22                1
-    ## 4       2014                  1                 8       16                1
-    ## 5       2015                  1                 4       16                1
-    ## 6       2016                  1                 8       13                1
-
-or:
-
-``` r
 pivot_wider(olivia, id_cols = "race", names_from = "birth_year", values_from = "rank") 
 ```
 
@@ -225,25 +239,6 @@ male_name = baby[pull(baby, gender) == "male",] %>%
   group_by(birth_year, race) %>% 
   slice(which.min(rank))
 # create the table
-pivot_wider(
-  male_name, id_cols = "birth_year", names_from = "race", values_from = "first_name"
-)
-```
-
-    ## # A tibble: 6 x 5
-    ## # Groups:   birth_year [6]
-    ##   birth_year `asian and pacifi… `black non hispa… hispanic `white non hisp…
-    ##        <dbl> <chr>              <chr>             <chr>    <chr>           
-    ## 1       2011 Ethan              Jayden            Jayden   Michael         
-    ## 2       2012 Ryan               Jayden            Jayden   Joseph          
-    ## 3       2013 Jayden             Ethan             Jayden   David           
-    ## 4       2014 Jayden             Ethan             Liam     Joseph          
-    ## 5       2015 Jayden             Noah              Liam     David           
-    ## 6       2016 Ethan              Noah              Liam     Joseph
-
-or:
-
-``` r
 pivot_wider(male_name, id_cols = "race",names_from = "birth_year",values_from = "first_name")
 ```
 
@@ -274,7 +269,7 @@ plot = white16 %>%
 plot
 ```
 
-![](hw2_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](hw2_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 ggsave("plot.pdf")
